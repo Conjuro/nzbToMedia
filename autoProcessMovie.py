@@ -1,30 +1,11 @@
 import sys
-import urllib
+import urllib2
 import os.path
 import shutil
 import ConfigParser
 import time
 import json 
 from pprint import pprint 
-
-class AuthURLOpener(urllib.FancyURLopener):
-    def __init__(self, user, pw):
-        self.username = user
-        self.password = pw
-        self.numTries = 0
-        urllib.FancyURLopener.__init__(self)
-    
-    def prompt_user_passwd(self, host, realm):
-        if self.numTries == 0:
-            self.numTries = 1
-            return (self.username, self.password)
-        else:
-            return ('', '')
-
-    def openit(self, url):
-        self.numTries = 0
-        return urllib.FancyURLopener.open(self, url)
-
 
 def process(dirName, nzbName=None, status=0):
 
@@ -41,8 +22,6 @@ def process(dirName, nzbName=None, status=0):
     
     host = config.get("CouchPotato", "host")
     port = config.get("CouchPotato", "port")
-    username = config.get("CouchPotato", "username")
-    password = config.get("CouchPotato", "password")
     apikey = config.get("CouchPotato", "apikey")
     delay = float(config.get("CouchPotato", "delay"))
     method = config.get("CouchPotato", "method")
@@ -57,8 +36,6 @@ def process(dirName, nzbName=None, status=0):
         web_root = config.get("CouchPotato", "web_root")
     except ConfigParser.NoOptionError:
         web_root = ""
-
-    myOpener = AuthURLOpener(username, password)
 
     nzbName1 = str(nzbName)
 
@@ -76,7 +53,7 @@ def process(dirName, nzbName=None, status=0):
         else:
             command = "renamer.scan" 
 
-        url = protocol + host + ":" + port + web_root + "/api/" + apikey + "/" + command
+        url = protocol + host + ":" + port + web_root + "/api/" + apikey + "/" + command + "/"
 
         print "waiting for", str(delay), "seconds to allow CPS to process newly extracted files"
 
@@ -85,7 +62,7 @@ def process(dirName, nzbName=None, status=0):
         print "Opening URL:", url
     
         try:
-            urlObj = myOpener.openit(url)
+            urlObj = urllib2.urlopen(url)
         except IOError, e:
             print "Unable to open URL: ", str(e)
             sys.exit(1)
@@ -105,12 +82,12 @@ def process(dirName, nzbName=None, status=0):
         imdbid=nzbName1[a:b]
         #print imdbid
 
-        url = protocol + host + ":" + port + web_root + "/api/" + apikey + "/movie.list"
+        url = protocol + host + ":" + port + web_root + "/api/" + apikey + "/movie.list/"
         
         print "Opening URL:", url
     
         try:
-            urlObj = myOpener.openit(url)
+            urlObj = urllib2.urlopen(url)
         except IOError, e:
             print "Unable to open URL: ", str(e)
             sys.exit(1)
@@ -138,7 +115,7 @@ def process(dirName, nzbName=None, status=0):
         print "Opening URL:", url
     
         try:
-            urlObj = myOpener.openit(url)
+            urlObj = urllib2.urlopen(url)
         except IOError, e:
             print "Unable to open URL: ", str(e)
             sys.exit(1)

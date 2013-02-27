@@ -4,8 +4,6 @@ outputDirectory = /abs/path/to/complete/movies
 apikey =
 host = localhost
 port = 5050
-username = 
-password =
 ###### ADVANCED USE - ONLY EDIT IF YOU KNOW WHAT YOU'RE DOING ###### 
 ssl = 0
 web_root =
